@@ -10,5 +10,6 @@ class ModListView(ListView):
     template_name = 'modlist/list.html'
 
 class ModCreateView(CreateView):
-    form = ModlistForm
+    form_class = ModlistForm
     template_name = 'modlist/add.html'
+    success_url = 'list'
