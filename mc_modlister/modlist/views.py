@@ -8,3 +8,7 @@ from .models import Modlist
 class ModListView(ListView):
     model = Modlist
     template_name = 'modlist/list.html'
+
+class ModCreateView(CreateView):
+    form = ModlistForm
+    template_name = 'modlist/add.html'
