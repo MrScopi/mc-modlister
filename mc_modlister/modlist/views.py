@@ -1,3 +1,10 @@
 from django.shortcuts import render
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.urls import reverse_lazy
 
-# Create your views here.
+from .forms import ModlistForm
+from .models import Modlist
+
+class ModListView(ListView):
+    model = Modlist
+    template_name = 'modlist/list.html'
