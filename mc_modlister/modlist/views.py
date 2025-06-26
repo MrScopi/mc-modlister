@@ -4,18 +4,17 @@ from django.urls import reverse_lazy
 
 from rest_framework.generics import CreateAPIView, ListAPIView
 
-from .forms import ModlistForm
-from .models import Modlist
-from .serializers import ModlistSerializer
+from .models import TrackedMods
+from .serializers import TrackedModsSerializer
 
 class ModListView(ListView):
-    model = Modlist
+    model = TrackedMods
     template_name = 'modlist/list.html'
 
 class ModCreateAPIView(CreateAPIView):
-    queryset = Modlist.objects.all()
-    serializer_class = ModlistSerializer
+    queryset = TrackedMods.objects.all()
+    serializer_class = TrackedModsSerializer
 
 class ModListAPIView(ListAPIView):
-    queryset = Modlist.objects.all()
-    serializer_class = ModlistSerializer
+    queryset = TrackedMods.objects.all()
+    serializer_class = TrackedModsSerializer
