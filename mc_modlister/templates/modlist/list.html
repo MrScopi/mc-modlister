@@ -13,7 +13,6 @@ Add new mod
             <th>Mod Name</th>
             <th>Slug</th>
             <th>Description</th>
-            <th>Downloads</th>
             <th>Project Page</th>
           </tr>
         </thead>
@@ -53,7 +52,7 @@ Add new mod
         return response.json();
         })
         .then(data => {
-            renderResults(data.hits);
+            renderResults(data.hits, searchResultsBody);
         })
         .catch(error => {
         // Handle any errors during the fetch operation
@@ -61,11 +60,11 @@ Add new mod
         });
     });
 
-    function renderResults(mods) {
-        searchResultsBody.innerHTML = '';  // Clear previous results
+    function renderResults(mods, targetTable) {
+        targetTable.innerHTML = '';  // Clear previous results
     
         if (mods.length === 0) {
-            searchResultsBody.innerHTML = '<tr><td colspan="5">No results found.</td></tr>';
+            targetTable.innerHTML = '<tr><td colspan="4">No results found.</td></tr>';
             return;
         }
     
@@ -75,10 +74,9 @@ Add new mod
                 <td>${mod.title}</td>
                 <td>${mod.slug}</td>
                 <td>${mod.description || 'No description'}</td>
-                <td>${mod.downloads.toLocaleString()}</td>
                 <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
             `;
-            searchResultsBody.appendChild(row);
+            targetTable.appendChild(row);
         });
     }
 
