@@ -31,9 +31,9 @@
             <tr>
                 <th></th>
                 <th>Mod Name</th>
-                <th>Slug</th>
                 <th>Description</th>
                 <th>Project Page</th>
+                <th>Add to Modlist</th>
             </tr>
         </thead>
             <tbody id="searchResultsBody">
@@ -99,13 +99,41 @@
         row.innerHTML = `
             <td><img src="${mod.icon_url}"></td>
             <td>${mod.title}</td>
-            <td>${mod.slug}</td>
             <td>${mod.description || 'No description'}</td>
             <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
+            <td><a href="javascript:addMod('${mod.project_id}','${mod.title}')">ADD</a></td>
         `;
         return row;
     }
     
+    function addMod(modProjectId, modTitle) {
+        const modData = {
+            project_id: modProjectId,
+            mod_name: modTitle,
+        };
+        
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(modData)
+        };
+
+        fetch('api/add', options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 
 </script>
 {% endblock page_scripts %}

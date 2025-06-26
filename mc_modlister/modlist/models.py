@@ -15,7 +15,7 @@ MC_VERSIONS = [
 class TrackedMods(models.Model):
 
     # Data we store, not fetch at refresh
-    project_id = models.CharField(null=True, max_length=8)
+    project_id = models.CharField(max_length=8, primary_key=True)
     mod_name = models.CharField(null=True)
     installed_version = models.CharField(null=True)
     installed_version_type = models.CharField(null=True, choices=VERSION_TYPE)
