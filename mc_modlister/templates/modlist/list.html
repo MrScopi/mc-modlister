@@ -1,25 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-Add new mod
-<br>
-<label for="mod_name_search">Search for mod by name:</label>
-<br>
-<input type="text" id='mod_name_search'></input>
-<button type='submit' id='mod_search_button'>Search</button>
-<div id='search_results'>
+<div id='current_mods'>
+    <h1>Current Mods</h1>
+    <br>
+    <table id='currentModsTable' border="1" style='margin-top:20px; width:100%; border-collapse: collapse;'>
+        <thead>
+            <tr>
+                <th>Mod Name</th>
+                <th>Description</th>
+                <th>Installed Version</th>
+                <th>Latest Version</th>
+                <th>Update Needed?</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<hr>
+<div id='add_new_mod'>
+    <h1>Add new mod</h1>
+    <br>
+    <label for="mod_name_search">Search for mod by name:</label>
+    <br>
+    <input type="text" id='mod_name_search'></input>
+    <button type='submit' id='mod_search_button'>Search</button>
     <table id="searchResultsTable" border="1" style="margin-top:20px; width:100%; border-collapse: collapse;">
         <thead>
-          <tr>
-            <th>Mod Name</th>
-            <th>Slug</th>
-            <th>Description</th>
-            <th>Project Page</th>
-          </tr>
+            <tr>
+                <th></th>
+                <th>Mod Name</th>
+                <th>Slug</th>
+                <th>Description</th>
+                <th>Project Page</th>
+            </tr>
         </thead>
-        <tbody id="searchResultsBody">
-          <!-- Search results will go here -->
-        </tbody>
-      </table>
+            <tbody id="searchResultsBody">
+            <!-- Search results will go here -->
+            </tbody>
+    </table>
 </div>
 {% endblock content %}
 
@@ -64,22 +83,27 @@ Add new mod
         targetTable.innerHTML = '';  // Clear previous results
     
         if (mods.length === 0) {
-            targetTable.innerHTML = '<tr><td colspan="4">No results found.</td></tr>';
+            targetTable.innerHTML = '<tr><td colspan="5">No results found.</td></tr>';
             return;
         }
     
         mods.forEach(mod => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${mod.title}</td>
-                <td>${mod.slug}</td>
-                <td>${mod.description || 'No description'}</td>
-                <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
-            `;
-            targetTable.appendChild(row);
+            modRow = searchResultsRow(mod);
+            targetTable.appendChild(modRow);
         });
     }
 
+    function searchResultsRow(mod) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><img src="${mod.icon_url}"></td>
+            <td>${mod.title}</td>
+            <td>${mod.slug}</td>
+            <td>${mod.description || 'No description'}</td>
+            <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
+        `;
+        return row;
+    }
     
 
 </script>
