@@ -150,7 +150,7 @@
     function modListRow(mod) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${mod.mod_name}</td>
+            <td><a href="javascript:removeMod('${mod.project_id}')">X</a> ${mod.mod_name}</td>
             <td>desc</td>
             <td>${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
             <td>${mod.latest_version} (MC: ${mod.latest_mc_version})</td>
@@ -206,7 +206,24 @@
             .catch(error => {
                 console.error('Error:', error);
             });
-    }
+    };
+
+    function removeMod(modProjectId) {
+        const options = {
+            method: 'DELETE',
+        };
+
+        fetch(`api/destroy/${modProjectId}`, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            getModList();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
 
     getModList();
 </script>
