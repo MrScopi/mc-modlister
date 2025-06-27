@@ -128,7 +128,7 @@
             <td>${mod.title}</td>
             <td>${mod.description || 'No description'}</td>
             <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
-            <td><a href="javascript:addMod('${mod.project_id}','${mod.title}')">ADD</a></td>
+            <td><a href="javascript:addMod('${mod.project_id}','${mod.title}','${currentVersion.value}')">ADD</a></td>
         `;
         return row;
     }
@@ -152,8 +152,8 @@
         row.innerHTML = `
             <td>${mod.mod_name}</td>
             <td>desc</td>
-            <td>${mod.installed_version}</td>
-            <td>${mod.latest_version}</td>
+            <td>${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
+            <td>${mod.latest_version} (MC: ${mod.latest_mc_version})</td>
             <td>Update?</td>
             <td>download</td>
         `;
@@ -178,10 +178,11 @@
             });
     }
     
-    function addMod(modProjectId, modTitle) {
+    function addMod(modProjectId, modTitle, installedMCVersion) {
         const modData = {
             project_id: modProjectId,
             mod_name: modTitle,
+            installed_mc_version: installedMCVersion,
         };
         
         const options = {
