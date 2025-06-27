@@ -24,6 +24,8 @@
     <table id='currentModsTable' border="1" style='margin-top:20px; width:100%; border-collapse: collapse;'>
         <thead>
             <tr>
+                <th>Delete</th>
+                <th>Edit</th>
                 <th>Mod Name</th> <!-- Name (link to page) by Author -->
                 <th>Description</th>
                 <th>Installed Version</th> <!--"Mod version (MC-version)"-->
@@ -137,7 +139,7 @@
         targetTable.innerHTML = '';  // Clear previous results
     
         if (mods.length === 0) {
-            targetTable.innerHTML = '<tr><td colspan="6">No results found.</td></tr>';
+            targetTable.innerHTML = '<tr><td colspan="8">No results found.</td></tr>';
             return;
         }
     
@@ -150,13 +152,16 @@
     function modListRow(mod) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><a href="javascript:removeMod('${mod.project_id}')">X</a> ${mod.mod_name}</td>
-            <td>desc</td>
-            <td>${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
+            <td><a href="javascript:removeMod('${mod.project_id}')">X</a></td>
+            <td><a href="javascript:editModDetails('${mod.project_id}')">edit</a></td>
+            <td>${mod.mod_name}</td>
+            <td id="description-${mod.project_id}">desc</td>
+            <td id="installed-${mod.project_id}">${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
             <td>${mod.latest_version} (MC: ${mod.latest_mc_version})</td>
             <td>Update?</td>
             <td>download</td>
         `;
+        row.id = `row-${mod.project_id}`;
         return row;
     }
 
@@ -223,6 +228,14 @@
         .catch(error => {
             console.error('Error:', error);
         });
+    };
+
+    function editModDetails(modProjectId) {
+        const descriptionCell = document.getElementById(`description-${modProjectId}`);
+        const installedCell = document.getElementById(`installed-${modProjectId}`);
+
+        const currentDescriptionText = descriptionCell.textContent;
+        descriptionCell.innerHTML = `<input id='description-text-${modProjectId}' value='${currentDescriptionText}'>`
     };
 
     getModList();
