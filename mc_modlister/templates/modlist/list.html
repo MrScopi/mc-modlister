@@ -124,7 +124,7 @@
     function searchResultsRow(mod) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><img src="${mod.icon_url}"></td>
+            <td><img src="${mod.icon_url}" height="60px" width="60px"></td>
             <td>${mod.title}</td>
             <td>${mod.description || 'No description'}</td>
             <td><a href="https://modrinth.com/mod/${mod.slug}" target="_blank">View</a></td>
