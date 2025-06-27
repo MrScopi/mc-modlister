@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <div id='current_mods'>
+    <h1>Minecraft Server Modlist</h1>
+    <p>
+        <label for="current_mc_version">Current version:</label>
+        <select id="current_mc_version">
+            <option value="1.21.5">1.21.5</option>
+            <option value="1.21.6">1.21.6</option>
+            <option value="1.21.7">1.21.7</option>
+        </select>
+    </p>
+    <p>
+        <label for="target_mc_version">Targeted version:</label>
+        <select id="target_mc_version">
+            <option value="1.21.5">1.21.5</option>
+            <option value="1.21.6">1.21.6</option>
+            <option value="1.21.7">1.21.7</option>
+        </select>
+    </p>
     <h1>Current Mods</h1>
     <br>
     <table id='currentModsTable' border="1" style='margin-top:20px; width:100%; border-collapse: collapse;'>
@@ -23,8 +41,12 @@
     <h1>Add new mod</h1>
     <br>
     <label for="mod_name_search">Search for mod by name:</label>
-    <br>
-    <input type="text" id='mod_name_search'></input>
+    <input type="search" id='mod_name_search'></input>
+    <label for='search_sort_method'>Sort by:</label>
+    <select id='search_sort_method'>
+        <option value='relevance'>Relevance</option>
+        <option value='downloads'>Downloads</option>
+    </select>
     <button type='submit' id='mod_search_button'>Search</button>
     <table id="searchResultsTable" border="1" style="margin-top:20px; width:100%; border-collapse: collapse;">
         <thead>
@@ -46,9 +68,13 @@
 {% block page_scripts %}
 <script>
     const searchResultsBody = document.getElementById('searchResultsBody');
+    const modListBody = document.getElementById('modListBody');
     const searchButton = document.getElementById("mod_search_button");
     
     const searchText = document.getElementById('mod_name_search');
+    const searchSortMethod = document.getElementById('search_sort_method')
+    const currentVersion = document.getElementById('current_mc_version');
+    const targetVersion = document.getElementById('target_mc_version')
 
     const myHeaders = new Headers();
     myHeaders.append('User-Agent', 'mrscopi/mc-modlist/ (contact admin@loottables.app)');
@@ -57,7 +83,8 @@
         const params = new URLSearchParams();
         params.append("query", searchText.value);
         params.append("limit", 20);
-        params.append("facets", '[["categories:fabric"],["server_side:required"],["project_type:mod"],["versions:1.21.5","versions:1.21.6"]]')
+        params.append("facets", `[["categories:fabric"],["server_side:required", "server_side:optional"],["client_side:optional", "client_side:unsupported"],["project_type:mod"],["versions >= ${currentVersion.value}"]]`)
+        params.append("index", searchSortMethod.value);
 
         fetch(`https://api.modrinth.com/v2/search?${params}`, {
             method: 'GET',
@@ -72,7 +99,7 @@
         return response.json();
         })
         .then(data => {
-            renderResults(data.hits, searchResultsBody);
+            renderSearchResults(data.hits, searchResultsBody);
         })
         .catch(error => {
         // Handle any errors during the fetch operation
@@ -80,7 +107,7 @@
         });
     });
 
-    function renderResults(mods, targetTable) {
+    function renderSearchResults(mods, targetTable) {
         targetTable.innerHTML = '';  // Clear previous results
     
         if (mods.length === 0) {
@@ -105,6 +132,51 @@
         `;
         return row;
     }
+
+    function renderListResults(mods, targetTable) {
+        targetTable.innerHTML = '';  // Clear previous results
+    
+        if (mods.length === 0) {
+            targetTable.innerHTML = '<tr><td colspan="6">No results found.</td></tr>';
+            return;
+        }
+    
+        mods.forEach(mod => {
+            modRow = modListRow(mod);
+            targetTable.appendChild(modRow);
+        });
+    }
+
+    function modListRow(mod) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${mod.mod_name}</td>
+            <td>desc</td>
+            <td>${mod.installed_version}</td>
+            <td>${mod.latest_version}</td>
+            <td>Update?</td>
+            <td>download</td>
+        `;
+        return row;
+    }
+
+    function getModList() {
+        // Get the list
+        fetch('api/list')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                return response.json();
+            })
+            .then(mods => {
+                renderListResults(mods, modListBody)
+            })
+            .catch(error => {
+                // Handle any errors during the fetch operation
+                console.error('Error fetching data:', error);
+            });
+    }
     
     function addMod(modProjectId, modTitle) {
         const modData = {
@@ -128,12 +200,13 @@
                 return response.json();
             })
             .then(data => {
-                alert('Success');
+                getModList();
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     }
 
+    getModList();
 </script>
 {% endblock page_scripts %}
