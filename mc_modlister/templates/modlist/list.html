@@ -15,7 +15,7 @@
         <label for="target_mc_version">Targeted version:</label>
         <select id="target_mc_version">
             <option value="1.21.5">1.21.5</option>
-            <option value="1.21.6">1.21.6</option>
+            <option value="1.21.6" selected>1.21.6</option>
             <option value="1.21.7">1.21.7</option>
         </select>
     </p>
@@ -74,9 +74,9 @@
     const searchButton = document.getElementById("mod_search_button");
     
     const searchText = document.getElementById('mod_name_search');
-    const searchSortMethod = document.getElementById('search_sort_method')
+    const searchSortMethod = document.getElementById('search_sort_method');
     const currentVersion = document.getElementById('current_mc_version');
-    const targetVersion = document.getElementById('target_mc_version')
+    const targetVersion = document.getElementById('target_mc_version');
 
     const myHeaders = new Headers();
     myHeaders.append('User-Agent', 'mrscopi/mc-modlist/ (contact admin@loottables.app)');
@@ -94,11 +94,11 @@
           })
         .then(response => {
         // Check if the request was successful (status code 200-299)
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        // Parse the response as JSON
-        return response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Parse the response as JSON
+            return response.json();
         })
         .then(data => {
             renderSearchResults(data.hits, searchResultsBody);
@@ -151,19 +151,47 @@
 
     function modListRow(mod) {
         const row = document.createElement('tr');
+        const latestVersionJson = getLatestVersion(mod.project_id);
+        
+        console.log(latestVersionJson)
         row.innerHTML = `
             <td><a href="javascript:removeMod('${mod.project_id}')">X</a></td>
             <td><a href="javascript:editModDetails('${mod.project_id}')">edit</a></td>
             <td>${mod.mod_name}</td>
             <td id="description-${mod.project_id}">desc</td>
             <td id="installed-${mod.project_id}">${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
-            <td>${mod.latest_version} (MC: ${mod.latest_mc_version})</td>
+            <td>${latestVersionJson.version_number} (MC: ${mod.latest_mc_version})</td>
             <td>Update?</td>
-            <td>download</td>
+            <td><a href="https://modrinth.com/mod/${mod.project_id}/versions">Downloads<a></td>
         `;
         row.id = `row-${mod.project_id}`;
+        
         return row;
     }
+
+    function getLatestVersion(modProjectId) {
+        const params = new URLSearchParams();
+        params.append("loaders", JSON.stringify(["fabric"]));
+        params.append("game_versions", JSON.stringify([targetVersion.value]));
+
+        const latestVersion = fetch(`https://api.modrinth.com/v2/project/${modProjectId}/version?${params}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                return response.json();
+            })
+            .then(versions => {
+                return versions[0];
+            })
+            .catch(error => {
+                // Handle any errors during the fetch operation
+                console.error('Error fetching data:', error);
+            });
+
+        return latestVersion;
+
+    };
 
     function getModList() {
         // Get the list
