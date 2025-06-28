@@ -143,42 +143,41 @@
             return;
         }
     
-        mods.forEach(mod => {
-            modRow = modListRow(mod);
+        mods.forEach(async mod => {
+            const modRow = await modListRow(mod);
             targetTable.appendChild(modRow);
         });
     }
 
-    function modListRow(mod) {
+    async function modListRow(mod) {
         const row = document.createElement('tr');
-        const latestVersionJson = getLatestVersion(mod.project_id);
+        const latestVersionJson = await getLatestVersion(mod.project_id);
         
-        console.log(latestVersionJson)
         row.innerHTML = `
             <td><a href="javascript:removeMod('${mod.project_id}')">X</a></td>
             <td><a href="javascript:editModDetails('${mod.project_id}')">edit</a></td>
             <td>${mod.mod_name}</td>
             <td id="description-${mod.project_id}">desc</td>
             <td id="installed-${mod.project_id}">${mod.installed_version} (MC: ${mod.installed_mc_version})</td>
-            <td>${latestVersionJson.version_number} (MC: ${mod.latest_mc_version})</td>
+            <td>${latestVersionJson.version_number} (MC: ${targetVersion.value})</td>
             <td>Update?</td>
-            <td><a href="https://modrinth.com/mod/${mod.project_id}/versions">Downloads<a></td>
+            <td><a href="${latestVersionJson.files[0].url}">Downloads<a></td>
         `;
         row.id = `row-${mod.project_id}`;
         
         return row;
     }
 
-    function getLatestVersion(modProjectId) {
+    async function getLatestVersion(modProjectId) {
         const params = new URLSearchParams();
         params.append("loaders", JSON.stringify(["fabric"]));
         params.append("game_versions", JSON.stringify([targetVersion.value]));
 
-        const latestVersion = fetch(`https://api.modrinth.com/v2/project/${modProjectId}/version?${params}`)
+        const latestVersion = await fetch(`https://api.modrinth.com/v2/project/${modProjectId}/version?${params}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
-                }
+                };
                 return response.json();
             })
             .then(versions => {
